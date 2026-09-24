@@ -1,0 +1,96 @@
+name: gates
+
+# A green check that asserts nothing is worse than no check (a sibling set once shipped
+# a CI leg that tested the same configuration as the leg beside it and reported both green). So
+# every gate that can be broken on purpose is broken on purpose here, on a
+# scratch copy, and the run fails if the gate does not.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  SHELL_CMD: nix develop ${{ github.workspace }} --command
+
+jobs:
+  gates:
+    name: specification gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v31
+
+      - name: Run all gates
+        run: nix develop --command bash tools/check-all.sh
+
+      - name: Prove the identifier gate can fail
+        run: |
+          set -euo pipefail
+          tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
+          cp -r . "$tmp/repo"
+          cd "$tmp/repo"
+          printf '\n**OVR-9999** A citation to `DOM-9999`, which does not exist.\n' >> 00-overview.md
+          if $SHELL_CMD python3 tools/check_ids.py; then
+            echo "::error::identifier gate passed a document with a dangling citation"
+            exit 1
+          fi
+          echo "identifier gate correctly rejected a dangling citation"
+
+      - name: Prove the obligation gate can fail
+        run: |
+          set -euo pipefail
+          tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
+          cp -r . "$tmp/repo"
+          cd "$tmp/repo"
+          printf '\n**OVR-9998** The daemon `DOM-1` MUST record `a_column_dom1_never_mentions`.\n' \
+            >> 00-overview.md
+          if $SHELL_CMD python3 tools/check_obligations.py; then
+            echo "::error::obligation gate passed a duty its target never mentions"
+            exit 1
+          fi
+          echo "obligation gate correctly rejected an orphaned obligation"
+
+      - name: Prove the citation gate can fail
+        run: |
+          set -euo pipefail
+          tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
+          cp -r . "$tmp/repo"
+          cd "$tmp/repo"
+          printf '\n`OVR-1` says "a phrase OVR-1 has never contained anywhere".\n' \
+            >> 00-overview.md
+          if $SHELL_CMD python3 tools/check_citations.py; then
+            echo "::error::citation gate passed a quote its target does not contain"
+            exit 1
+          fi
+          echo "citation gate correctly rejected an unverifiable quoted attribution"
+
+      - name: Prove the fixture gate can fail
+        run: |
+          set -euo pipefail
+          tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
+          cp -r . "$tmp/repo"
+          cd "$tmp/repo"
+          printf '{"ok": true, "created_at": 1.5}\n' > fixtures/wire/broken.json
+          if $SHELL_CMD python3 tools/check_fixtures.py; then
+            echo "::error::fixture gate passed a non-integer number"
+            exit 1
+          fi
+          echo "fixture gate correctly rejected a non-integer number"
+
+      - name: Prove the coverage gate can fail
+        run: |
+          set -euo pipefail
+          tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
+          cp -r . "$tmp/repo"
+          cd "$tmp/repo"
+          # An uncovered requirement above the recorded baseline is a regression.
+          printf '\n**OVR-9997** A requirement no conformance item cites.\n' >> 00-overview.md
+          # 9997 would be an outlier for the identifier gate; the coverage gate does not care.
+          if $SHELL_CMD python3 tools/check_coverage.py; then
+            echo "::error::coverage gate passed a fall below the recorded baseline"
+            exit 1
+          fi
+          echo "coverage gate correctly rejected an uncovered requirement"
