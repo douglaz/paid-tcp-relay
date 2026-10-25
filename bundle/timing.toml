@@ -10,3 +10,6 @@ min_spacing = "1s"         # per destination, minimum interval between dials (DS
 window = "15m"             # per destination, the pacing window (DST-3)
 window_cap = 200           # per destination, dials allowed per window (DST-3)
 # max_destinations         # per pass, recorded destinations allowed: undecided (F5, PAS-8)
+
+auth_timeout = "30s"      # placeholder; challenge to complete AUTH, /v2/ only (WIR-13)
+dial_timeout = "15s"      # placeholder; accepted AUTH through OK, /v2/ only (WIR-13)

@@ -1,0 +1,18 @@
+{
+  "id": "fc16881a73580686e5c3bbd315040df4e4ff00e24b6ee008858e7f8cce125642",
+  "pubkey": "57610009a2539bcff59f25127c237c3e05a63bf291c0e4f43214974e3654f4eb",
+  "created_at": 1758672000,
+  "kind": 30079,
+  "tags": [
+    [
+      "d",
+      "paid-tcp-relays"
+    ],
+    [
+      "expiration",
+      "1758675600"
+    ]
+  ],
+  "content": "{\"version\":1,\"relays\":[\"wss://relay.example.net/\",\"wss://relay-alt.example.net:8443/\"]}",
+  "sig": "371d74d1ae79d485b48fd11fefb92172d05a5a0238c7c6160bfb8dae15a47651228381a78469ca8003b25cb3f7e867d5218d3f8294abbe77b18d9ee3e6283cca"
+}

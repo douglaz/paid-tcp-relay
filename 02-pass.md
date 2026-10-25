@@ -48,3 +48,10 @@ offered to others, not of the protocol.
 **PAS-8** A pass's expiry and its number of recorded destinations are bounds the relay's
 operator sets and MUST publish to holders before purchase, so a holder knows what a pass buys.
 The default figures are `bundle/timing.toml`'s (`OPR-7`); the destination cap's figure is `F5`.
+
+**PAS-9** **/v2/ retirement and removal.** A hand-removed pass is retired, distinct from a
+PAS-5 signed revocation. Under `/v2/`, revocation, retirement and reaching the recorded expiry
+MUST terminate all affected pending and live connections immediately under WIR-12. Removing
+a destination from a pass MUST do the same for that host on every port. There is no grace
+period or wait for the next payload or handshake. New attempts are refused by WIR-6's pass
+or destination check. Hand removal does not demonstrate the signed revocation exchange.

@@ -1,0 +1,23 @@
+{
+  "id": "4ace263b39c7c2c28b4b0f10bcd87268347302a583f35a77cf7eb261bb120651",
+  "pubkey": "f82ad82d44745e7d22c682f75220ce72bc7a0ec0b0398ef48c166dc0c6036a2c",
+  "created_at": 1758672000,
+  "kind": 22242,
+  "tags": [
+    [
+      "relay",
+      "wss://relay-alt.example.net:8443/"
+    ],
+    [
+      "challenge",
+      "c2VydmVyLWNoYWxsZW5nZS0zMi1ieXRlcy0wMDAwMDE"
+    ],
+    [
+      "destination",
+      "203.0.113.10",
+      "22"
+    ]
+  ],
+  "content": "",
+  "sig": "2c7b34ebbb00446a8ae457f1602bd5901f4fe8118d4e379876b5944b5ca161610742784b232dff43e6a81923b2447d22a53e40e9b2e2fee2e0d4480fb200387f"
+}

@@ -78,3 +78,16 @@ refuse service (`OVR-2`, `OPR-9`). The relay never holds or checks a pin.
 **Reason**:
 The one-word member of a refusal frame: `auth`, `pass`, `destination`, `address`, `pace`, or
 `dial` (`WIR-7`). Closed set; a new reason is a new protocol revision (`WIR-3`).
+
+**Publisher discovery key**:
+The publisher's long-lived public signing identity for public relay announcements, separate from every holder's relay key (`WIR-14`, `OPR-10`).
+
+**Discovery starting set**:
+The consumer's compiled public Nostr endpoints for retrieving a publisher announcement. An announcement does not replace that set (`OPR-10`).
+
+**Public base URL** / **alias**:
+A relay service's canonical public `wss` origin followed by `/`, including a non-default public port where used (`WIR-14`). An alias is another configured public base for the same service and shared state (`OPR-10`); connection binding uses the base actually opened (`WIR-4`).
+
+**Retirement**:
+Administrative hand removal of a pass under `/v2/`, distinct from the holder-signed revocation
+(`PAS-9`, `PAS-5`).

@@ -1,0 +1,18 @@
+{
+  "id": "720f3776045667e2ddb026d9dafe8e209ab73eb73d67a48f37c8df0f2b135d63",
+  "pubkey": "57610009a2539bcff59f25127c237c3e05a63bf291c0e4f43214974e3654f4eb",
+  "created_at": 1758672001,
+  "kind": 30079,
+  "tags": [
+    [
+      "d",
+      "paid-tcp-relays"
+    ],
+    [
+      "expiration",
+      "1758675601"
+    ]
+  ],
+  "content": "{\"version\":1,\"relays\":[]}",
+  "sig": "408641c9afa1e72f3431c7f16e63c1ffed38e2285619935a834d3df5643ff46d74bf529f54afba7380ddd0c9064c0a9ce0c606a9e5d809438671d49c282e81cb"
+}

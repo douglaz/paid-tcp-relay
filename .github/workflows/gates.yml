@@ -32,7 +32,7 @@ jobs:
           tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
           cp -r . "$tmp/repo"
           cd "$tmp/repo"
-          printf '\n**OVR-9999** A citation to `DOM-9999`, which does not exist.\n' >> 00-overview.md
+          printf '\nA citation to `WIR-9999`, which does not exist.\n' >> 00-overview.md
           if $SHELL_CMD python3 tools/check_ids.py; then
             echo "::error::identifier gate passed a document with a dangling citation"
             exit 1
@@ -45,7 +45,7 @@ jobs:
           tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
           cp -r . "$tmp/repo"
           cd "$tmp/repo"
-          printf '\n**OVR-9998** The daemon `DOM-1` MUST record `a_column_dom1_never_mentions`.\n' \
+          printf '\n**OVR-9998** The relay `OPR-1` MUST record `a_column_opr1_never_mentions`.\n' \
             >> 00-overview.md
           if $SHELL_CMD python3 tools/check_obligations.py; then
             echo "::error::obligation gate passed a duty its target never mentions"

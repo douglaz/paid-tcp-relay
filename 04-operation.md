@@ -45,8 +45,8 @@ over content; a party that also serves the consumer's software is a bigger obser
 that serves the software alone. Per-purchase keys (`PAS-2`) bound what a key reveals; the
 destination set correlates purchases anyway.
 
-**OPR-7** Every cadence and timeout the relay enforces — `relay.auth_skew`, `relay.min_spacing`,
-`relay.window`, `relay.window_cap` — lives in `bundle/timing.toml` by name, and a rule cites
+**OPR-7** Every cadence, timeout and cap the relay enforces lives in
+`bundle/timing.toml` by name, and its owning rule cites
 the name. The numbers live only there; a value marked placeholder is replaced by the first
 integrated run's measurement, in one commit.
 
@@ -60,3 +60,7 @@ the consumer's pin.
 A consumer whose client trusts a host key on first use has no such bound — at first contact a
 hostile relay can present its own key, have it pinned, and read the session from then on — and
 MUST say so wherever it offers first-use trust.
+
+**OPR-10** **Publisher announcement and moves.** An operator offering publisher-key discovery MUST publish WIR-14 with its long-lived publisher discovery key P, separate from every holder's relay key. The publisher MUST dedicate the WIR-14 event address to this schema and not reuse it for another application. It MUST mirror each current announcement, including an empty withdrawal, to every endpoint in the compiled discovery starting set required by the consumer. Those endpoints MUST serve the announcement publicly without the subscriber authenticating as P. The publisher MUST keep at least one independently hosted discovery endpoint usable across a TCP-service domain move and republish before the announcement expires. A compiled starting-set change requires a new consumer build; announcement content cannot change that starting set. Each newly issued replacement announcement, including an empty withdrawal or expiration renewal, MUST have a `created_at` strictly greater than every earlier announcement issued at this address, and an expiration no earlier than any announcement it supersedes. The publisher MUST NOT future-date an announcement to obtain that ordering. Retransmission mirrors the same signed event; extending its signed expiration requires a newly signed successor. These duties prevent timestamp-tie loss and a successor expiring before a still-valid predecessor; they do not prove that a reader has received the newest event.
+
+Every listed TCP URL MUST be operated by the same operator and serve the same pass records, destination sets, expiry and retirement state, and pacing/window counters. Concurrent aliases share that state; a domain move preserves it. A new URL never creates a new pass or resets a limit. If continuity cannot be maintained, the publisher MUST withdraw the default rather than advertise unrelated pass state. This duty does not require an old TCP URL to remain live. Discovery availability and what a fresh restore can establish remain bounded by the consumer's validity checks.

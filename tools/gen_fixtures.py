@@ -80,8 +80,42 @@ def main():
     for name, obj in frames.items():
         with open(os.path.join("fixtures/wire", name), "w") as f:
             json.dump(obj, f, indent=2); f.write("\n")
+    generate_v2(d, challenge, host, port, created_at)
     print("url:", f"{relay.rstrip('/')}/v1/tcp/{host}/{port}")
     print("pubkey:", pub)
+
+
+def event(d, created_at, kind, tags, content=""):
+    pub, _ = sign(d, bytes(32))
+    body = json.dumps([0, pub, created_at, kind, tags, content],
+                      separators=(",", ":"), ensure_ascii=False)
+    eid = hashlib.sha256(body.encode()).digest()
+    _, sig = sign(d, eid)
+    return {"id": eid.hex(), "pubkey": pub, "created_at": created_at,
+            "kind": kind, "tags": tags, "content": content, "sig": sig}
+
+
+def generate_v2(holder, challenge, host, port, created_at):
+    frames = {}
+    aliases = ["wss://relay.example.net/", "wss://relay-alt.example.net:8443/"]
+    for label, base in zip(("primary", "alternate"), aliases):
+        frames[f"wire/v2/{label}-challenge.json"] = {"challenge": challenge, "relay": base}
+        frames[f"wire/v2/{label}-auth.json"] = event(
+            holder, created_at, 22242,
+            [["relay", base], ["challenge", challenge], ["destination", host, port]])
+    publisher = int.from_bytes(hashlib.sha256(
+        b"paid-tcp-relay fixture publisher discovery key 1").digest(), "big") % N
+    for offset, label, relays in [(0, "listed", aliases), (1, "withdrawn", []),
+                                  (2, "renewed", aliases)]:
+        content = json.dumps({"version": 1, "relays": relays}, separators=(",", ":"))
+        frames[f"discovery/{label}.json"] = event(
+            publisher, created_at + offset, 30079,
+            [["d", "paid-tcp-relays"], ["expiration", str(created_at + 3600 + offset)]], content)
+    for name, obj in frames.items():
+        path = os.path.join("fixtures", name)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            json.dump(obj, f, indent=2); f.write("\n")
 
 
 if __name__ == "__main__":
