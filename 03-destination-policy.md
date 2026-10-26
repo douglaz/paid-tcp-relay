@@ -15,7 +15,10 @@ read at the host; the port is the holder's to choose per connection.
 **DST-3** Dials to a recorded destination MUST be **paced**: at least `relay.min_spacing`
 between dials to one destination, and at most `relay.window_cap` dials to one destination per
 `relay.window` (`bundle/timing.toml`, `OPR-7`). A dial the pace does not allow is refused with
-reason `pace` (`WIR-7`). Pacing is what makes a wide port range useless as a scanning service;
+reason `pace` (`WIR-7`). Under `/v2/`, consume the spacing and window slot atomically when
+the dial starts, not when check 6 admits an unstarted reservation. Serialize concurrent
+attempts at initiation so they cannot exceed either bound. Failed or cancelled initiated
+dials are not refunded. Pacing is what makes a wide port range useless as a scanning service;
 together with `DST-1`, a cap on the number of recorded destinations (`PAS-8`), payment (`PAS-1`)
 and revocation (`PAS-5`), it is what keeps the relay from being the open proxy `OPR-1` forbids.
 

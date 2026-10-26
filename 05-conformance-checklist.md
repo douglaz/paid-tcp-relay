@@ -14,12 +14,32 @@ lnrent's `SEC-38` logging clause; tau-web's numbering is not preserved.
 
 ## The handshake
 
-- [ ] **CNF-3** A connection receives a fresh challenge; an unknown key, a replayed signature, a
+- [ ] **CNF-3** Under `/v1/`, a connection receives a fresh challenge; an unknown key, a replayed signature, a
       mismatched destination tag, an unparseable path and an unserved prefix are each refused
       with the stated reason and close code before any dial; the order challenge, AUTH, OK holds;
       a binary frame before OK or a text frame after it closes the socket with 1002; a failed
       dial answers `dial` with 1011 and no OK. (`WIR-1`, `WIR-2`, `WIR-3`, `WIR-4`, `WIR-5`,
       `WIR-6`, `WIR-7`, `WIR-8`, `WIR-9`)
+
+      Under `/v2/`, exercise the same handshake and admission refusals. `WIR-8` says
+      "A receiver MUST discard text data after OK or binary data before OK and terminate the
+      connection" and "The relay and a client whose API permits it use code 1002; a browser
+      application client uses 4002". Demonstrate each direction and confirm discarded data
+      never reaches the stream consumer.
+      Control frames and fragmented binary messages remain usable. Send extra client text and
+      binary data during a delayed accepted-AUTH dial: no OK or bytes, 1002, dial cancellation
+      and late-success closure (WIR-12). Exercise both an unstarted cancellation and a started
+      failed/cancelled dial against DST-3's pacing counters, including concurrent attempts.
+
+      Demonstrate normal TCP EOF and write-half-close draining already-read bytes before 1000;
+      reset and read/write failures closing 1011; client Close with and without a code; and no
+      half-open surviving stream. Do not demand a sent reserved code or infer `wasClean` from
+      the code. Policy termination does not drain queued bytes. Bound AUTH and delayed dialing
+      with the named WIR-13 values, observing the corresponding JSON refusal, close and no OK;
+      late dial success remains closed. A healthy payload-quiet connection is not idle-evicted.
+      (`WIR-12`, `WIR-13`, `DST-3`)
+
+      Under `/v2/`, verify WIR-4, WIR-5 and WIR-6 URL binding using two configured aliases. A connection opened under each alias receives that alias as its advertised public base, and matching AUTH succeeds. AUTH for another alias is refused as auth/1008 before dialing. A client receiving a challenge whose relay differs from its dialed base sends no AUTH; the browser closes with 4002. Include a non-default public port and WHATWG default-port elision.
 - [ ] **CNF-4** **No dial happens before the AUTH is accepted**, verified by watching the relay's
       outbound connections during a refused AUTH; and **no application byte is forwarded before
       OK**, verified by sending bytes before OK and observing that none reach the destination.
@@ -27,6 +47,8 @@ lnrent's `SEC-38` logging clause; tau-web's numbering is not preserved.
 - [ ] **CNF-5** The fixtures under `fixtures/wire/` load as the frames `01-wire-protocol.md`
       defines, and the AUTH fixture's signature verifies for its `pubkey`. (`WIR-4`, `WIR-5`,
       `WIR-7`, `OVR-6`)
+      Verify the signed events in `fixtures/discovery/` against WIR-14 as well, including
+      their event ids and signatures and empty withdrawal. (`WIR-14`)
 
 ## Access
 
@@ -44,9 +66,16 @@ lnrent's `SEC-38` logging clause; tau-web's numbering is not preserved.
       (`PAS-4`)
 - [ ] **CNF-9** A revoked pass stops working immediately, including on a connection already
       open: verified by revoking — a message signed by the pass's key — while a session is live
-      and confirming the socket closes and a reconnect is refused. (`PAS-5`)
+      and confirming the socket closes and a reconnect is refused. Under `/v2/`, also retire
+      a pass by hand and remove a destination while dialing and after OK, including a quiet
+      connection and late dial success. Observe immediate terminal state, no further bytes or
+      OK, 1008 with `pass` or `destination`, pre-OK refusal JSON and no post-OK JSON. Removal of
+      a host affects every port and leaves unrelated destinations usable. Hand retirement does
+      not count as the signed-revocation demonstration. (`PAS-5`, `PAS-9`, `WIR-12`)
 - [ ] **CNF-10** A hand-recorded pass carries an expiry and is refused after it, and obeys every
-      other check unchanged. (`PAS-6`, `PAS-7`)
+      other check unchanged. Under `/v2/`, reach expiry during a pending dial and an open quiet
+      session: apply WIR-12 immediately, retain started-dial pacing, and refuse reconnects.
+      (`PAS-6`, `PAS-7`, `PAS-9`, `WIR-12`)
 - [ ] **CNF-11** The pass's expiry and destination cap are published to a holder before
       purchase. (`PAS-8`)
 
@@ -82,3 +111,5 @@ lnrent's `SEC-38` logging clause; tau-web's numbering is not preserved.
       `ws://` origin is refused. (`OPR-8`)
 - [ ] **CNF-20** A consumer offering first-use trust states the hostile-relay residual where it
       offers it. (`OPR-9`, `OVR-1`, `OVR-3`, `OVR-4`)
+
+- [ ] **CNF-21** Where OPR-10 discovery is offered, fetch and verify its public WIR-14 event anonymously, including from the independently hosted mirror; demonstrate a domain move or concurrent aliases preserving pass, destination, expiry, retirement and pacing state. Verify that each replacement withdrawal and expiration renewal advances `created_at` without future-dating, that no successor expires before a superseded announcement, and that a withdrawal is publicly retrievable. Exercise the consumer's expiration refusal without claiming a permanent remote tombstone. (`WIR-14`, `OPR-10`)

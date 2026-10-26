@@ -57,3 +57,11 @@ and an unrecorded arrangement hardens into the default by inertia.
 - A self-hosted relay's host runs whatever else that host runs; a consumer whose host machines
   carry a model with box-plane reach must price that model as a metadata observer of what the
   relay retains, which `OPR-5` keeps to pass records only.
+
+## Public discovery, October 25 amendment
+
+The public announcement and publisher duties have their homes in WIR-14 and OPR-10. The consumer pins the
+publisher key and public discovery starting set; a TCP-domain move preserves pass state and
+limits across aliases. This does not move a consumer's private notify inbox or establish that
+a reader has obtained the newest remote event. The kind is application-defined; no global
+reservation is asserted.
