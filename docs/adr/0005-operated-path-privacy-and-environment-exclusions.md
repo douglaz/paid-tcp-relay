@@ -5,43 +5,46 @@ conformance items.
 
 ## Decisions
 
-The owner selected "Keep no history". OPR-5 owns the retained-state policy; deployment on a
-shared host does not move an operated collector outside the relay operator's duties.
-Persistent usage metrics are not an additional permitted store. The restart consequence and
-continuity checks have their homes in DST-3 and CNF-13.
+The owner selected "Keep no history". For the retained-state policy, see OPR-5:
+"Event-derived values may exist only as in-memory current-window pacing state and MUST NOT
+be exported to a collector or store." Shared hosting does not move an operated collector
+outside the relay operator's control. For restart admission and its demonstration, see DST-3
+and CNF-13.
 
-The owner selected "The relay refuses them itself". DST-4 owns optional `/v2/` hosting-profile
-environment exclusions, and DST-2 owns eligibility and unavailable coverage. The rule excludes
-whole environment targets; it does not allow unrelated public targets or a chosen port subset
-to disappear from a scan. Consumer-specific environment coverage belongs in that consumer.
+The owner selected "The relay refuses them itself". For optional `/v2/` hosting-profile
+environment exclusions, see DST-4: "Exclusions cover whole destination hosts, never selected
+ports, and MUST be limited to hosting/environment targets, never unrelated public destinations."
+For eligibility and unavailable coverage, see DST-2. Consumer-specific environment coverage
+belongs in that consumer.
 
-DST-7 keeps the shared recommendation and owns declarations of an adopted independent barrier.
-A consumer owns its stronger hosting admission and any precisely declared resolver exception;
-a connector-usable private resolver TCP/53 route remains outside the second wall.
+For the shared egress recommendation and adopted-barrier declarations, see DST-7:
+"A private resolver TCP/53 route usable by that identity is outside the independent-denial
+guarantee; it MUST NOT be described as universal denial or made safe merely by calling it DNS."
+A consumer owns its stronger hosting admission and any precisely declared resolver exception.
 
 ## Revision and consumers
 
 WIR-3 says "A revision that changes a frame, a reason string, a close code or the check order
-is a new prefix, never a mutation of `/v1/`." The environment set is a configurable predicate
-within the existing WIR-6 address check, using its existing refusal. Frames, reasons, close
-codes, check order and pass records are unchanged; no new prefix is required. The new optional
-predicate is confined to `/v2/`; `/v1/` does not acquire it. The container self-address inventory
-makes the existing host boundary explicit, rather than classifying every cluster public address
-as self.
+is a new prefix, never a mutation of `/v1/`." WIR-6 check 5 reads
+"**address** — `DST-4` admits the address;". The environment set is a configurable predicate
+evaluated there; for the refusal, see WIR-7. Frames, reasons, close codes, check order and pass
+records are unchanged; no new prefix is required. The new optional predicate is confined to
+`/v2/`; `/v1/` does not acquire it. For the container self-address inventory, see DST-4:
+"Other public cluster workloads are not
+automatically the relay's own host; their exclusion is an explicit profile choice."
 
-Consumer review: tau-web selects `/v2/` at CHN-15 and adopts environment coverage in CHN-11;
-its pin and ARC-41 eligibility boundary change in its consumer amendment. lnrent's VMH-19,
-SEC-38 and relay references in its delivery protocol and ADR 0028 still leave private-unit
-addressing to F1. This amendment does not define that deferred kind, select a new profile for
-lnrent, or silently admit private units through the public-unicast relay.
+Consumer review inputs: tau-web CHN-15, CHN-11 and ARC-41 at
+`f13e9d277945b885dc23220df626b9adf97c5eac`; lnrent VMH-19, SEC-38, its delivery protocol
+and ADR 0028 at `5c01250933854de236e24e954c2db3132b0764af`. For consumer adoption, see those
+owners; for the deferred destination kind, see F1. This amendment selects no new lnrent
+profile and defines no private-unit addressing.
 
 ## Alternatives and evidence
 
 Retained aggregates would expand retained state. Enrollment alone would not supply the selected
 relay-side refusal for environment targets. A path-based definition of every public cluster
-workload as the relay host was not selected. An exclusion is visible unavailability, never
-proof of the public port surface. Existing external-route migration duties remain at OPR-4.
+workload as the relay host was not selected. For unavailable coverage, see DST-2;
+for external-route migration, see OPR-4.
 
-Executable suites and status belong to implementations. The checklist distinguishes local,
-deployment and live-client observations; source or fixture results cannot establish effective
-routing, certificate handling, collector retention or the artifact behind a public base.
+For executable suites, record ownership and observation points, see the Evidence records
+section of `05-conformance-checklist.md`.

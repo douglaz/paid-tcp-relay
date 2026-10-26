@@ -9,8 +9,8 @@ in the record MUST be refused with reason `destination` (`WIR-7`) before any dia
 **DST-2** A recorded destination eligible under DST-4 is reachable on **any port**, never on
 one port alone (`ADR-0003`). For those eligible destinations, the relay's view MUST equal the
 world's: a relay that forwards only port 22 makes every machine behind it show exactly one open
-port to a consumer that probes which ports answer, which is a check that cannot fail and is worse than no check. The record is
-read at the host; the port is the holder's to choose per connection. A DST-4 exclusion
+port to a consumer that probes which ports answer, which is a check that cannot fail and is
+worse than no check. The record is read at the host; the port is the holder's to choose per connection. A DST-4 exclusion
 MUST be reported as unavailable coverage, never as closed ports or a successful outside-in
 verification. Managing or scanning an excluded target requires an eligible external route;
 no equal-view claim is available until that route is demonstrated.
@@ -25,9 +25,10 @@ dials are not refunded. Pacing is what makes a wide port range useless as a scan
 together with `DST-1`, a cap on the number of recorded destinations (`PAS-8`), payment (`PAS-1`)
 and revocation (`PAS-5`), it is what keeps the relay from being the open proxy `OPR-1` forbids.
 
-Restart MUST NOT refund consumed spacing or window capacity. Preserve safe admission without
-retaining connection history under OPR-5: when restart loses event-derived pacing state, refuse
-conservatively until both bounds can be met. Concurrent replicas and OPR-10 aliases or domain
+Restart MUST NOT refund consumed spacing or window capacity. `OPR-5` says "Event-derived values
+may exist only as in-memory current-window pacing state and MUST NOT be exported to a
+collector or store." When restart loses event-derived pacing state, refuse conservatively
+until both bounds can be met. Concurrent replicas and OPR-10 aliases or domain
 moves MUST NOT multiply or reset these limits. Discard event-derived state when its current
 window no longer needs it; neither logs nor backups may preserve past-window dial history.
 
@@ -54,8 +55,9 @@ with the existing `address` refusal. A required environment inventory that is mi
 incomplete fails closed. Exclusions cover whole destination hosts, never selected ports, and
 MUST be limited to hosting/environment targets, never unrelated public destinations. Other
 public cluster workloads are not automatically the relay's own host; their exclusion is an
-explicit profile choice. This configurable predicate stays within WIR-6 check 5 and changes no
-frame, reason string, close code, check order or pass record. `/v1/` gains no optional
+explicit profile choice. `WIR-6` check 5 reads "**address** — `DST-4` admits the address;".
+Evaluate the configurable predicate there, with no change to frame, reason string, close code,
+check order or pass record. `/v1/` gains no optional
 environment-exclusion predicate.
 
 **DST-5** For a DNS destination the relay MUST resolve through its own resolver, MUST refuse the
@@ -69,8 +71,8 @@ registries, pinned at a stated revision; an update to them is a reviewed policy 
 an unattended refresh.
 
 **DST-7** The relay host SHOULD deny non-global, self and adopted profile-environment routes
-at its egress firewall as defence in depth; application destination checks remain mandatory
-under DST-4. A consumer MAY require this independent barrier for its own hosting profile.
+at its egress firewall as defence in depth. For application destination checks, see DST-4.
+A consumer MAY require this independent barrier for its own hosting profile.
 
 An adopted barrier MUST declare effective coverage in both families, host/node exceptions,
 routing/NAT and any permitted infrastructure flows by exact endpoint, protocol and port,

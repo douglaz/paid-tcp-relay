@@ -64,10 +64,10 @@ verdict/configuration/control records MUST NOT contain real-holder topology.
       (`WIR-12`, `WIR-13`, `DST-3`)
 
       Under `/v2/`, verify WIR-4, WIR-5 and WIR-6 URL binding using two configured aliases. A connection opened under each alias receives that alias as its advertised public base, and matching AUTH succeeds. AUTH for another alias is refused as auth/1008 before dialing. A client receiving a challenge whose relay differs from its dialed base sends no AUTH; the browser closes with 4002. Include a non-default public port and WHATWG default-port elision.
-- [ ] **CNF-4** **No dial happens before the AUTH is accepted**, verified by watching the relay's
-      outbound connections during a refused AUTH; and **no application byte is forwarded before
-      OK**, verified by sending bytes before OK and observing that none reach the destination.
-      Two tests, not one. The outbound-initiation observer MUST detect a deliberately early
+- [ ] **CNF-4** `WIR-10` says "Nothing MUST be dialed before the AUTH is accepted (`WIR-6`
+      complete), and no application byte MUST be forwarded before `OK` has been sent."
+      Watch the relay's outbound connections during a refused AUTH; separately send bytes before
+      OK and observe that none reach the destination. Two tests, not one. The outbound-initiation observer MUST detect a deliberately early
       attempt even if no destination accepts it; an empty destination listener or a client
       refusal/timeout is not that observation. Include a positive destination-byte observation
       control separately. (`WIR-10`)
@@ -98,9 +98,11 @@ verdict/configuration/control records MUST NOT contain real-holder topology.
       connection and late dial success. Observe immediate terminal state, no further bytes or
       OK, 1008 with `pass` or `destination`, pre-OK refusal JSON and no post-OK JSON. Removal of
       a host affects every port and leaves unrelated destinations usable. Hand retirement does
-      not count as the signed-revocation demonstration. Check running authoritative-state
-      acknowledgments for retirement/removal, failed reload refusal to acknowledge, cancelled
-      pending work and unchanged unrelated destinations; store/apply success is insufficient.
+      not count as the signed-revocation demonstration. `PAS-10` says "An edit MUST be
+      acknowledged only when the running relay reports its inclusion in authoritative state."
+      Exercise retirement/removal acknowledgments, failed reload refusal to acknowledge,
+      cancelled pending work and unchanged unrelated destinations; reject acknowledgment based
+      solely on store/apply success.
       (`PAS-5`, `PAS-9`, `PAS-10`, `WIR-12`)
 - [ ] **CNF-10** A hand-recorded pass carries an expiry and is refused after it, and obeys every
       other check unchanged. Under `/v2/`, reach expiry during a pending dial and an open quiet
@@ -111,35 +113,37 @@ verdict/configuration/control records MUST NOT contain real-holder topology.
 
 ## Destinations
 
-- [ ] **CNF-12** A pass reaches only the destinations recorded against it and eligible under
-      DST-4, on **any** port: verified by attempting an undeclared destination on the SSH port and on another, both
-      refused, and a recorded destination on a non-SSH port, which succeeds. (`DST-1`, `DST-2`)
-- [ ] **CNF-13** Dials to a recorded destination are paced: verified by driving a probe tool
-      flat out at one destination and measuring the rate the relay actually allows against
+- [ ] **CNF-12** `DST-2` says "A recorded destination eligible under DST-4 is reachable on
+      **any port**, never on one port alone (`ADR-0003`)." Attempt an undeclared destination on
+      the SSH port and on another, both refused, and an eligible recorded destination on a
+      non-SSH port, which succeeds. (`DST-1`, `DST-2`)
+- [ ] **CNF-13** Exercise DST-3 by driving a probe tool flat out at one recorded destination
+      and measuring the rate the relay actually allows against
       `relay.min_spacing`, `relay.window` and `relay.window_cap`, including clock/window
       boundaries. Under `/v2/`, cover initiation accounting, concurrent attempts and
-      failed/cancelled initiated dials. For every served profile, restart, concurrent replicas,
-      aliases and domain moves do not refund or multiply either bound; losing in-memory counters
-      refuses conservatively until safe. Inspect expiration of old state and backups without
-      retaining past-window history. (`DST-3`, `OPR-5`, `OPR-7`, `OPR-10`)
-- [ ] **CNF-14** A recorded destination cannot reach relay-private services: loopback,
-      private and link-local IPv4 and IPv6, metadata endpoints, IPv4-mapped IPv6, alternate
-      numeric spellings and the relay host's own addresses are refused, at registration and on
-      every dial. Include assigned pod/workload, underlying node and service/public front-door
+      failed/cancelled initiated dials. For every served profile, test restart, concurrent
+      replicas, aliases and domain moves against both bounds. Lose in-memory counters and
+      verify conservative refusal until safe. Inspect expiration of old state and backups;
+      reject retained past-window dial history. (`DST-3`, `OPR-5`, `OPR-7`, `OPR-10`)
+- [ ] **CNF-14** Exercise DST-4, DST-5 and DST-6 at registration and every dial. Check refusal
+      of loopback, private and link-local IPv4 and IPv6, metadata endpoints, IPv4-mapped IPv6,
+      alternate numeric spellings and the relay host's own addresses. Include assigned pod/workload, underlying node and service/public front-door
       addresses in both families, missing/stale/incomplete inventories, and an inventory change
       before a queued dial starts. Under `/v2/`, also exercise adopted environment-exclusion
       sets, including public addresses and DNS answers, whole-host refusal across ports and
-      unrelated public positive controls. An excluded target is unavailable coverage, not a
-      successful scan or closed-port result. A public DNS name changing to a private address,
-      mixed public and private answers, and retries are each refused; the dialer uses only the
-      validated numeric address; valid public SSH and other-port destinations remain reachable. Application-policy
-      demonstrations are unconditional. Separately demonstrate independent firewall enforcement
+      unrelated public positive controls. Check reporting against DST-2: "A DST-4 exclusion
+      MUST be reported as unavailable coverage, never as closed ports or a successful outside-in
+      verification." Refuse a public DNS name changing to a private address, mixed public and
+      private answers, and retries; observe numeric dialer targets and successful public SSH and
+      other-port controls. Application-policy demonstrations are unconditional. Separately demonstrate independent firewall enforcement
       where adopted or required by a consumer; explicitly record omissions otherwise. In an
       isolated enforcement setup, bypass the application guard and attempt forbidden, self and
       adopted environment routes in both families, with public SSH and other-port controls.
       Attempt declared infrastructure endpoints and neighboring addresses/ports to verify exact
-      coverage, recording whether the connector identity can use each exception. A private
-      resolver TCP/53 exception is independently undenied, never a universal-denial pass.
+      coverage, recording whether the connector identity can use each exception. Check any
+      private resolver TCP/53 exception against DST-7: "A private resolver TCP/53 route usable
+      by that identity is outside the independent-denial guarantee; it MUST NOT be described as
+      universal denial or made safe merely by calling it DNS."
       Deliberately opening a forbidden rule must be detected. Local namespace/firewall evidence
       covers that setup, not a future deployment's enforcement, host exceptions or routing/NAT.
       Effective deployment inventory and enforcement require their own bound evidence.
@@ -149,13 +153,13 @@ verdict/configuration/control records MUST NOT contain real-holder topology.
 
 ## Operation
 
-- [ ] **CNF-16** The relay retains no connection log or connection-derived metric history:
-      inspect every declared operated observation, collection and retention sink and downstream
+- [ ] **CNF-16** `OPR-5` says "The relay MUST keep no connection log." Inspect every declared
+      operated observation, collection and retention sink and downstream
       copy after synthetic successful, refused and sparse single-attempt traffic. Include
       operated resolver/L4/host collectors, source-IP/time-only records, labels, exemplars,
-      successive samples, joins, rotations and backups. Find only OPR-5-permitted state;
-      event-derived current-window pacing values stay in memory and are not exported or
-      persisted. Deliberately enabling any retained event-derived metric, an event record or
+      successive samples, joins, rotations and backups. Compare retained state with OPR-5;
+      check current-window pacing storage and attempt collector exports and persistence.
+      Deliberately enabling any retained event-derived metric, an event record or
       a reconstructing series must fail the check, even without identifying labels. Declare
       outside observers separately. Static and isolated checks do not certify historical absence or deployment silence; inspect the
       effective deployed operated path separately. (`OPR-5`)
