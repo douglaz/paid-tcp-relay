@@ -54,9 +54,8 @@ and an unrecorded arrangement hardens into the default by inertia.
   as a configured value, never a constant.
 - Relay redundancy under one operator is an availability move; an independently operated second
   relay is also a trust change and is priced as one.
-- A self-hosted relay's host runs whatever else that host runs; a consumer whose host machines
-  carry a model with box-plane reach must price that model as a metadata observer of what the
-  relay retains, which `OPR-5` keeps to pass records only.
+- A self-hosted relay's host runs whatever else that host runs. The consumer's trust accounting
+  includes additional observers of the permitted retained state; see OPR-5 for its limits.
 
 ## Public discovery, October 25 amendment
 

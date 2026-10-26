@@ -33,9 +33,27 @@ run elsewhere; the product says so rather than hiding it.
 **OPR-5** The relay MUST keep no connection log. Which holder reached which destination and
 when is the one thing a relay learns that the consumer's pin does not hide, and a host that
 both serves the destination and records the approach holds a record nobody asked it to keep.
-What the relay retains is its pass records (`PAS-3`) and the counters `DST-3` needs for the
-current window; a relay on a host with other duties is that host's to declare, and the
-declaration MUST list no retained connection record.
+This duty covers successful sessions and failed attempts across every traffic-observation,
+collection and retention component under the relay operator's control, including ingress/L4
+forwarding, relay output/files, operated resolvers, node/network flow telemetry, error/debug/trace
+channels, metric labels/exemplars/series, collectors, rotations and backups. Retained source-IP
+and time records are connection records even when TLS hides the destination path. Joining
+operated stores to reconstruct who reached what or when is also forbidden.
+
+What the relay retains is its pass records (PAS-3), the in-memory current-window pacing state
+permitted below and health data not derived from connection activity. The selected policy is
+"Keep no history": retained health data MUST NOT include values derived from connection, dial,
+refusal or byte-transfer events, including per-workload network/connection-tracking/flow series
+collected by the hosting platform. Liveness, readiness, build identity, resource capacity and
+certificate-expiry values not derived from those events MAY be retained. Event-derived values
+may exist only as in-memory current-window pacing state and MUST NOT be exported to a
+collector or store. For pacing across restart, see `DST-3`. Pass records are not permission to
+retain connection history, including through public version history or indiscriminate backups.
+
+The operator's declaration MUST name the actual operated traffic, collection and storage paths,
+shared duties and observers outside its control, and list no operated retained connection
+record. It never excuses a connection log under that control or claims control over a network
+provider. Bounded inspections do not establish historical absence or future deployed silence.
 
 **OPR-6** The relay learns the **topology**: which key reached which destinations, when,
 accumulated over time. A consumer MUST say so in its own trust accounting, naming the relay's
@@ -63,4 +81,4 @@ MUST say so wherever it offers first-use trust.
 
 **OPR-10** **Publisher announcement and moves.** An operator offering publisher-key discovery MUST publish WIR-14 with its long-lived publisher discovery key P, separate from every holder's relay key. The publisher MUST dedicate the WIR-14 event address to this schema and not reuse it for another application. It MUST mirror each current announcement, including an empty withdrawal, to every endpoint in the compiled discovery starting set required by the consumer. Those endpoints MUST serve the announcement publicly without the subscriber authenticating as P. The publisher MUST keep at least one independently hosted discovery endpoint usable across a TCP-service domain move and republish before the announcement expires. A compiled starting-set change requires a new consumer build; announcement content cannot change that starting set. Each newly issued replacement announcement, including an empty withdrawal or expiration renewal, MUST have a `created_at` strictly greater than every earlier announcement issued at this address, and an expiration no earlier than any announcement it supersedes. The publisher MUST NOT future-date an announcement to obtain that ordering. Retransmission mirrors the same signed event; extending its signed expiration requires a newly signed successor. These duties prevent timestamp-tie loss and a successor expiring before a still-valid predecessor; they do not prove that a reader has received the newest event.
 
-Every listed TCP URL MUST be operated by the same operator and serve the same pass records, destination sets, expiry and retirement state, and pacing/window counters. Concurrent aliases share that state; a domain move preserves it. A new URL never creates a new pass or resets a limit. If continuity cannot be maintained, the publisher MUST withdraw the default rather than advertise unrelated pass state. This duty does not require an old TCP URL to remain live. Discovery availability and what a fresh restore can establish remain bounded by the consumer's validity checks.
+Every listed TCP URL MUST be operated by the same operator and serve the same pass records, destination sets, expiry and retirement state, and current-window pacing state and safe admission barriers under DST-3. Concurrent aliases share that state; a domain move preserves it. A new URL never creates a new pass or resets a limit. If continuity cannot be maintained, the publisher MUST withdraw the default rather than advertise unrelated pass state. This duty does not require an old TCP URL to remain live. Discovery availability and what a fresh restore can establish remain bounded by the consumer's validity checks.

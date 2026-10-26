@@ -31,8 +31,8 @@ not in v1 (`F2`); an operator MAY record by hand (`PAS-6`).
 
 **PAS-5** Revocation is a message signed by the pass's key. A revoked pass MUST close its live
 connections and refuse new ones immediately. What revocation protects is money and attribution:
-the relay's view of a destination equals the world's (`DST-2`), so a pass in the wrong hands
-reaches nothing the public internet does not; it spends the holder's paid quota and gets the
+`DST-2` says "For those eligible destinations, the relay's view MUST equal the world's": a
+pass in the wrong hands reaches nothing the public internet does not; it spends the holder's paid quota and gets the
 holder's pass blamed for the traffic. The revocation message's wire is not in v1 (`F2`).
 
 **PAS-6** A relay operator MAY record a pass by hand — a key's public half, its destination set
@@ -55,3 +55,9 @@ MUST terminate all affected pending and live connections immediately under WIR-1
 a destination from a pass MUST do the same for that host on every port. There is no grace
 period or wait for the next payload or handshake. New attempts are refused by WIR-6's pass
 or destination check. Hand removal does not demonstrate the signed revocation exchange.
+
+**PAS-10** **/v2/ edit acknowledgment.** An edit MUST be acknowledged only when the running
+relay reports its inclusion in authoritative
+state. Writing a configuration store or receiving deployment-tool apply success is insufficient;
+a failed reload MUST NOT acknowledge success. No particular reload transport or administrative
+protocol is selected here.
