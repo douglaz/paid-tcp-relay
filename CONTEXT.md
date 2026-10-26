@@ -36,8 +36,8 @@ holds it. Nothing bearer.
 _Avoid_: token, ticket, session, subscription (lnrent's word for something else)
 
 **Destination**:
-A host and a port a connection asks for, in the URL path (`WIR-1`). Recorded at the host;
-reachable on any port (`DST-2`).
+A host and a port a connection asks for, in the URL path (`WIR-1`). For destination recording,
+eligibility and ports, see `PAS-4`, `DST-4` and `DST-2`.
 
 **Destination record**:
 The set of hosts recorded against a pass, each added under the relay key's signature

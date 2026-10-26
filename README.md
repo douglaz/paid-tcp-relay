@@ -39,8 +39,9 @@ cadence and cap by name.
 |---|---|
 | `0001` | Access is bought, not granted, and bound to a relay key; nothing bearer exists |
 | `0002` | A consumer's publisher operates its default relay; self-hosting is the destination; bring-your-own is the escape hatch |
-| `0003` | A recorded destination is reachable on any port; per-destination pacing replaces the port restriction |
+| `0003` | Eligible recorded destinations have any-port reachability; per-destination pacing replaces the port restriction |
 | `0004` | `/v2/` defines connection binding and termination; `/v1/` is preserved |
+| `0005` | Operated-path privacy, explicit environment exclusions and bound conformance evidence |
 
 ## Where this came from
 
