@@ -7,7 +7,7 @@ key-bound, destination-recorded, paced, revocable passes rather than by an accou
 
 It is written so that a relay, a client library, and a consumer's integration can each be built
 in any language and checked against it without reading any other repository. Two consumers
-cite it today: [tau-web](https://github.com/douglaz/tau-web-spec), whose browser harness
+cite it today: [Farseed](https://github.com/douglaz/farseed-spec) (formerly tau-web), whose browser harness
 reaches the machines it provisions through it, and
 [lnrent](https://github.com/douglaz/lnrent-spec), whose Buyers reach rented units through it.
 
@@ -99,3 +99,16 @@ Deleted from the documents. Never reused. Listed so an older citation still reso
 
 | Identifier | Was | Why it went |
 |---|---|---|
+
+## License
+
+Licensed under either of
+
+- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE))
+- MIT license ([LICENSE-MIT](LICENSE-MIT))
+
+at your option.
+
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in
+this work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without
+any additional terms or conditions.
